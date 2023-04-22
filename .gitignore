@@ -1,0 +1,7 @@
+# Extensions
+*.pdf
+*.docx
+*.csv
+
+# Exceptions
+*111*
