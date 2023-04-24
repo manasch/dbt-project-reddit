@@ -28,14 +28,18 @@ def publish_to_topic(topic_name, payload):
     producer.flush()
 
 def main():
-    subreddits = {
-        "askreddit_endpoint" : pushshift_api_endpoint + "?subreddit=askreddit&size=10",
-        "cricket_endpoint" : pushshift_api_endpoint + "?subreddit=cricket&size=10",
-        "conspiracy_endpoint" : pushshift_api_endpoint + "?subreddit=conspiracy&size=10",
-        "funnysigns_endpoint" : pushshift_api_endpoint + "?subreddit=funnysigns&size=10",
-        "soccer_endpoint" : pushshift_api_endpoint + "?subreddit=soccer&size=10"
-    }
-
+    subreddit_list = ["askreddit", "cricket", "conspiracy", "funnysigns", "soccer"]
+    subreddits = {}
+    for i in subreddit_list:
+        subreddits[i+"_endpoint"] = pushshift_api_endpoint + f"?subreddit={i}&size=10"
+    # subreddits = {
+    #     "askreddit_endpoint" : pushshift_api_endpoint + "?subreddit=askreddit&size=10",
+    #     "cricket_endpoint" : pushshift_api_endpoint + "?subreddit=cricket&size=10",
+    #     "conspiracy_endpoint" : pushshift_api_endpoint + "?subreddit=conspiracy&size=10",
+    #     "funnysigns_endpoint" : pushshift_api_endpoint + "?subreddit=funnysigns&size=10",
+    #     "soccer_endpoint" : pushshift_api_endpoint + "?subreddit=soccer&size=10"
+    # }
+    # print(subreddits)
     while True:
         comments = subreddit_request(subreddits['askreddit_endpoint'])
         for comment in comments:
