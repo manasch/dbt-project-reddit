@@ -41,6 +41,7 @@ def main():
         subreddits[i + "_endpoint"] = pushshift_api_endpoint + f"?subreddit={i}&size=10"
 
     while True:
+        print("Sending request")
         comments = subreddit_request(subreddits['soccer_endpoint'])
         for comment in comments:
             publish_to_topic('askreddit', comment)
