@@ -35,13 +35,13 @@ parsed_stream = kafka_source.selectExpr("CAST(value AS STRING)").toDF("value") \
 
 # parsed_stream.printSchema()
 windows = parsed_stream \
-        .withWatermark("created_utc", "2 minutes") \
+        .withWatermark("created_utc", "2 seconds") \
         .groupBy(window("created_utc", "10 seconds"), "subreddit")
 
 aggregatedDF = windows.agg(count("*"))
 
 query = aggregatedDF.writeStream \
-            .outputMode("complete") \
+            .outputMode("append") \
             .option("truncate", False) \
             .format("console") \
             .start()

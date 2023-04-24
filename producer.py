@@ -12,14 +12,15 @@ user_agent = {'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebK
 recieved = []               # maintain a list of recieved comments
 
 def subreddit_request(api_endpoint):
-    # result = requests.get(api_endpoint, headers=user_agent).json()
-    with open('test.json') as f:
-        result = json.load(f)
+    result = requests.get(api_endpoint, headers=user_agent).json()
+    # with open('test.json') as f:
+    #     result = json.load(f)
     
     data = []
     if 'data' in result:
         for comment in result['data']:
             if comment['id'] not in recieved:
+            # if True:
                 data.append({
                     'subreddit': comment['subreddit'],
                     'id': comment['id'],
@@ -42,7 +43,7 @@ def main():
 
     while True:
         print("Sending request")
-        comments = subreddit_request(subreddits['soccer_endpoint'])
+        comments = subreddit_request(subreddits['askreddit_endpoint'])
         for comment in comments:
             publish_to_topic('askreddit', comment)
         print("sent")
