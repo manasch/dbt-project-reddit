@@ -12,7 +12,10 @@ user_agent = {'User-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebK
 recieved = []               # maintain a list of recieved comments
 
 def subreddit_request(api_endpoint):
-    result = requests.get(api_endpoint, headers=user_agent).json()
+    # result = requests.get(api_endpoint, headers=user_agent).json()
+    with open('test.json') as f:
+        result = json.load(f)
+    
     data = []
     if 'data' in result:
         for comment in result['data']:
@@ -35,18 +38,10 @@ def main():
     subreddit_list = ["askreddit", "cricket", "conspiracy", "funnysigns", "soccer"]
     subreddits = {}
     for i in subreddit_list:
-        subreddits[i+"_endpoint"] = pushshift_api_endpoint + f"?subreddit={i}&size=10"
-    # subreddits = {
-    #     "askreddit_endpoint" : pushshift_api_endpoint + "?subreddit=askreddit&size=10",
-    #     "cricket_endpoint" : pushshift_api_endpoint + "?subreddit=cricket&size=10",
-    #     "conspiracy_endpoint" : pushshift_api_endpoint + "?subreddit=conspiracy&size=10",
-    #     "funnysigns_endpoint" : pushshift_api_endpoint + "?subreddit=funnysigns&size=10",
-    #     "soccer_endpoint" : pushshift_api_endpoint + "?subreddit=soccer&size=10"
-    # }
-    # print(subreddits)
+        subreddits[i + "_endpoint"] = pushshift_api_endpoint + f"?subreddit={i}&size=10"
 
     while True:
-        comments = subreddit_request(subreddits['askreddit_endpoint'])
+        comments = subreddit_request(subreddits['soccer_endpoint'])
         for comment in comments:
             publish_to_topic('askreddit', comment)
         print("sent")
