@@ -36,19 +36,21 @@ def main():
     subreddits = {}
     for i in subreddit_list:
         subreddits[i+"_endpoint"] = pushshift_api_endpoint + f"?subreddit={i}&size=10"
-    # subreddits = {
-    #     "askreddit_endpoint" : pushshift_api_endpoint + "?subreddit=askreddit&size=10",
-    #     "cricket_endpoint" : pushshift_api_endpoint + "?subreddit=cricket&size=10",
-    #     "conspiracy_endpoint" : pushshift_api_endpoint + "?subreddit=conspiracy&size=10",
-    #     "funnysigns_endpoint" : pushshift_api_endpoint + "?subreddit=funnysigns&size=10",
-    #     "soccer_endpoint" : pushshift_api_endpoint + "?subreddit=soccer&size=10"
-    # }
-    # print(subreddits)
+    
 
     while True:
-        comments = subreddit_request(subreddits['askreddit_endpoint'])
-        for comment in comments:
-            publish_to_topic('askreddit', comment)
+        # comments = subreddit_request(subreddits['askreddit_endpoint'])
+        # for comment in comments:
+        #     publish_to_topic('askreddit', comment)
+        threads = []
+        for i in subreddits:
+            t = threading.Thread(target=publish_to_topic, args=(i, subreddits[i]))
+            threads.append(t)
+            t.start()
+
+        # Wait for all threads to finish
+        for t in threads:
+            t.join()
         print("sent")
         time.sleep(2)
 
