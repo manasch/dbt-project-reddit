@@ -45,13 +45,13 @@ def main():
         threads = []
         for i in subreddits:
             t = threading.Thread(target=publish_to_topic, args=(i, subreddits[i]))
+            print("Thread started for", i)
             threads.append(t)
             t.start()
 
         # Wait for all threads to finish
         for t in threads:
             t.join()
-        print("sent")
         time.sleep(2)
 
 if __name__ == "__main__":
