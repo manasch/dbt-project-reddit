@@ -33,7 +33,7 @@ def publish_to_topic(topic_name, payload):
 
 def multithread_this(endpoint, store):
     recvd = subreddit_request(store[endpoint])
-    publish_to_topic(endpoint, recvd)
+    publish_to_topic(endpoint[:-9], recvd)
     print("sent", endpoint)
 
 
