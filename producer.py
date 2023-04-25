@@ -13,14 +13,10 @@ recieved = []               # maintain a list of recieved comments
 
 def subreddit_request(api_endpoint):
     result = requests.get(api_endpoint, headers=user_agent).json()
-    # with open('test.json') as f:
-    #     result = json.load(f)
-    
     data = []
     if 'data' in result:
         for comment in result['data']:
             if comment['id'] not in recieved:
-            # if True:
                 data.append({
                     'subreddit': comment['subreddit'],
                     'id': comment['id'],
@@ -35,19 +31,35 @@ def publish_to_topic(topic_name, payload):
     producer.send(topic_name, payload)
     producer.flush()
 
+def multithread_this(endpoint, store):
+    recvd = subreddit_request(store[endpoint])
+    for i in recvd:
+        publish_to_topic(endpoint[:-9], i)
+    print("sent", endpoint)
+
+
 def main():
     subreddit_list = ["askreddit", "cricket", "conspiracy", "funnysigns", "soccer"]
     subreddits = {}
-    for i in subreddit_list:
-        subreddits[i + "_endpoint"] = pushshift_api_endpoint + f"?subreddit={i}&size=10"
+    for i in subreddit_list[:2]:
+        subreddits[i+"_endpoint"] = pushshift_api_endpoint + f"?subreddit={i}"
+    
 
     while True:
-        print("Sending request")
-        comments = subreddit_request(subreddits['askreddit_endpoint'])
-        for comment in comments:
-            publish_to_topic('askreddit', comment)
-        print("sent")
-        time.sleep(2)
+        # comments = subreddit_request(subreddits['askreddit_endpoint'])
+        # for comment in comments:
+        #     publish_to_topic('askreddit', comment)
+        threads = []
+        for i in subreddits:
+            t = threading.Thread(target=multithread_this, args=(i, subreddits))
+            print("Thread started for", i)
+            threads.append(t)
+            t.start()
+
+        # Wait for all threads to finish
+        for t in threads:
+            t.join()
+        time.sleep(10)
 
 if __name__ == "__main__":
     try:

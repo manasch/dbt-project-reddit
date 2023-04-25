@@ -24,7 +24,7 @@ kafka_source = spark \
     .readStream \
     .format('kafka') \
     .option('kafka.bootstrap.servers', 'localhost:9092') \
-    .option('subscribe', input_topic) \
+    .option('subscribe', "askreddit, cricket") \
     .load()
 
 # kafka_source.printSchema()
@@ -35,16 +35,18 @@ parsed_stream = kafka_source.selectExpr("CAST(value AS STRING)").toDF("value") \
 
 # parsed_stream.printSchema()
 windows = parsed_stream \
-        .withWatermark("created_utc", "2 seconds") \
+        .withWatermark("created_utc", "5 seconds") \
         .groupBy(window("created_utc", "10 seconds"), "subreddit")
 
 aggregatedDF = windows.agg(count("*"))
+
 
 query = aggregatedDF.writeStream \
             .outputMode("append") \
             .option("truncate", False) \
             .format("console") \
             .start()
+
 
 query.awaitTermination()
 
