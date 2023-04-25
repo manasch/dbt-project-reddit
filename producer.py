@@ -31,6 +31,12 @@ def publish_to_topic(topic_name, payload):
     producer.send(topic_name, payload)
     producer.flush()
 
+def multithread_this(endpoint, store):
+    recvd = subreddit_request(store[endpoint])
+    publish_to_topic(endpoint, recvd)
+    print("sent", endpoint)
+
+
 def main():
     subreddit_list = ["askreddit", "cricket", "conspiracy", "funnysigns", "soccer"]
     subreddits = {}
@@ -44,7 +50,7 @@ def main():
         #     publish_to_topic('askreddit', comment)
         threads = []
         for i in subreddits:
-            t = threading.Thread(target=publish_to_topic, args=(i, subreddits[i]))
+            t = threading.Thread(target=multithread_this, args=(i, subreddits))
             print("Thread started for", i)
             threads.append(t)
             t.start()
